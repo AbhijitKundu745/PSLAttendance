@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PSLAttendance" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.PSLAttendance" parent="Base.Theme.PSLAttendance" />
+    <style name="NoUnderlineTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/edit_text_underline_color</item>
+        <item name="boxBackgroundMode">none</item>
+        <item name="android:textColorHint">@color/primaryTextColor</item>
+    </style>
+
+</resources>

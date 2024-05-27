@@ -1,7 +1,13 @@
 <resources>
-    <string name="app_name">PSLAttendance</string>
+    <string name="app_name">AttendEase</string>
     <string name="login_email_hint">Email</string>
     <string name="login_password_hint">Password*</string>
+
+    <string name="login_data_validation">Please enter valid username/password</string>
+    <string name="reader_not_registered">RFID reader not registered. Contact ADMIN.</string>
+    <string name="something_went_wrong_error">Something went wrong. Contact ADMIN.</string>
+    <string name="communication_error">Error in communication with server.</string>
+    <string name="internet_error">No internet connection found, Please check your internet connection and try again.</string>
 
     <string name="footer">Powered by : Perceptron Software Labs Pvt Ltd</string>
 </resources>

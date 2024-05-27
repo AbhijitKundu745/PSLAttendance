@@ -10,8 +10,13 @@ public class SharedPreferenceManager {
     private static final String IS_LOGIN_SAVED = "IS_LOGIN_SAVED";
     private static final String LOGIN_USER = "LOGIN_USER_DETAILS";
     private static final String LOGIN_PASSWORD = "LOGIN_PASSWORD";
+    private static final String USER_FIRSTNAME = "FIRST_NAME";
     private static final String IMAGE_DATA = "IMAGE_DATA";
     private static final String LOCATION_DATA = "LOCATION_DATA";
+    private static final String USER_ID = "USER_ID";
+    private static final String LOCATION_NAME = "LOCATION_NAME";
+    private static final String CAMERA_PERMISSION = "CAMERA_PERMISSION";
+    private static final String LOCATION_PERMISSION = "LOCATION_PERMISSION";
 
     private SharedPreferenceManager() {} // prevent instantiation
     private static SharedPreferences getSharedPreferences(Context context) {
@@ -60,6 +65,28 @@ public class SharedPreferenceManager {
             prefs.edit().putString(LOGIN_PASSWORD, newValue).apply();
         }
     }
+    public static String getUserFirstname(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getString(USER_FIRSTNAME, null);
+    }
+
+    public static void setUserFirstname(Context context, String newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putString(USER_FIRSTNAME, newValue).apply();
+        }
+    }
+    public static String getUserId(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getString(USER_ID, null);
+    }
+
+    public static void setUserId(Context context, String newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putString(USER_ID, newValue).apply();
+        }
+    }
     public static String getImageData(Context context) {
         SharedPreferences prefs = getSharedPreferences(context);
         return prefs.getString(IMAGE_DATA, null);
@@ -82,5 +109,37 @@ public class SharedPreferenceManager {
             prefs.edit().putString(LOCATION_DATA, newValue).apply();
         }
     }
+    public static String getLocationName(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getString(LOCATION_NAME, null);
+    }
 
+    public static void setLocationName(Context context, String newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putString(LOCATION_NAME, newValue).apply();
+        }
+    }
+    public static Boolean getCameraPermission(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getBoolean(CAMERA_PERMISSION, false);
+    }
+
+    public static void setCameraPermission(Context context, Boolean newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putBoolean(CAMERA_PERMISSION, newValue).apply();
+        }
+    }
+    public static Boolean getLocationPermission(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getBoolean(LOCATION_PERMISSION, false);
+    }
+
+    public static void setLocationPermission(Context context, Boolean newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putBoolean(LOCATION_PERMISSION, newValue).apply();
+        }
+    }
 }

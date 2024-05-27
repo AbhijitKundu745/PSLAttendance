@@ -1,6 +1,8 @@
 package com.psl.pslattendance;
 
 
+import static com.psl.pslattendance.helper.AssetUtils.hideProgressDialog;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -8,14 +10,17 @@ import androidx.databinding.DataBindingUtil;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,9 +28,13 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
-import android.widget.Toast;
+import android.view.WindowManager;
 
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -33,17 +42,24 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.LocationCallback;
 import com.psl.pslattendance.databinding.ActivityPunchInOutBinding;
+import com.psl.pslattendance.helper.ApiConstants;
 import com.psl.pslattendance.helper.AssetUtils;
 import com.psl.pslattendance.helper.SharedPreferenceManager;
 import com.psl.pslattendance.holder.CameraPreview;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-public class PunchInOutActivity extends AppCompatActivity {
-    private ActivityPunchInOutBinding binding;
+import okhttp3.OkHttpClient;
+
+public class PunchInActivity extends AppCompatActivity {
+    ActivityPunchInOutBinding binding;
     private Context context = this;
 
     private static final int REQUEST_CAMERA_PERMISSION = 100;
@@ -51,8 +67,11 @@ public class PunchInOutActivity extends AppCompatActivity {
     private Camera camera;
     private CameraPreview mPreview;
     private boolean CameraPermissionGranted = false;
-    private boolean LocationPermissionGranted = false;
+    private boolean LocationPermissionGranted = true;
     private boolean IsCaptured = false;
+    String ImageData= null;
+    String LocationData = null;
+    String LocationCoordinates = null;
 
 
     @Override
@@ -60,66 +79,52 @@ public class PunchInOutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_punch_in_out);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_punch_in_out);
-        camera = getCameraInstance();
-
+        //camera = getCameraInstance();
         // Request camera permission
         requestCameraPermission();
         // Request location permission
         requestLocationPermission();
+        setDefault();
+        if(SharedPreferenceManager.getCameraPermission(context)){
+            Log.e("PermCamera", SharedPreferenceManager.getCameraPermission(context).toString());
+            CameraPermissionGranted = true;
+        }
+        if(SharedPreferenceManager.getLocationPermission(context)){
+            Log.e("PermLoc", SharedPreferenceManager.getLocationPermission(context).toString());
+            LocationPermissionGranted = true;
+        }
+        if(CameraPermissionGranted){
+            camera = getFrontFacingCamera();
+            if (camera != null) {
+                mPreview = new CameraPreview(this, camera);
+                binding.cameraPreview.addView(mPreview);
+            } else {
+                // Handle the case where the camera is not available
+            }
+        }
+
         if (LocationPermissionGranted) {
             retrieveLocation();
-        } else {
-            Toast.makeText(context, "Please allow location", Toast.LENGTH_SHORT).show();
         }
-//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.CAMERA},
-//                    REQUEST_CAMERA_PERMISSION);
-//        } else {
-//            // Initialize the camera
-//            CameraPermissionGranted = true;
-//            camera = getFrontFacingCamera();
-//        }
-//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    REQUEST_LOCATION_PERMISSION);
-//        } else {
-//            LocationPermissionGranted = true;
-//        }
-
         mPreview = new CameraPreview(this, camera);
         binding.cameraPreview.addView(mPreview);
-
+if(IsCaptured){
+    binding.buttonCapture.setVisibility(View.GONE);
+} else{
+    binding.buttonCapture.setVisibility(View.VISIBLE);
+}
         // Set up the capture button
         binding.buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (CameraPermissionGranted) {
-                    if(!IsCaptured){
                         takePicture();
-                    }
-                    else{
-                        binding.buttonCapture.setVisibility(View.INVISIBLE);
-                    }
                 } else {
-                    Toast.makeText(context, "Please allow the camera", Toast.LENGTH_SHORT).show();
+                    AssetUtils.showAlertDialog(context, "Access Error","Please allow the camera");
                 }
             }
         });
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//        binding.btnSetLocation.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (LocationPermissionGranted) {
-//                    retrieveLocation();
-//                } else {
-//                    Toast.makeText(context, "Please allow location", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
 
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable runnable = new Runnable() {
@@ -133,6 +138,20 @@ public class PunchInOutActivity extends AppCompatActivity {
             }
         };
         handler.postDelayed(runnable, 5000);
+
+        binding.userGreet.setText(SharedPreferenceManager.getUserFirstname(context));
+
+        binding.btnPunchIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(IsCaptured){
+                    uploadData();
+                }
+                else{
+                    AssetUtils.showAlertDialog(context, "", "Please capture your Image");
+                }
+            }
+        });
     }
 
     public static Camera getCameraInstance() {
@@ -195,26 +214,91 @@ public class PunchInOutActivity extends AppCompatActivity {
             }).start();
         }
     }
+    private Bitmap compressAndResizeBitmap(Bitmap bitmap, int quality, int maxDimension) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float aspectRatio = (float) width / height;
+        if (width > height && width > maxDimension) {
+            width = maxDimension;
+            height = (int) (width / aspectRatio);
+        } else if (height > width && height > maxDimension) {
+            height = maxDimension;
+            width = (int) (height * aspectRatio);
+        }
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, quality, byteArrayOutputStream);
+        return resizedBitmap;
+    }
     private Camera.PictureCallback PictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
                 // Convert the byte array to a Bitmap
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-
+                // Rotate the bitmap to the correct orientation
+                bitmap = rotateBitmap(bitmap, getCameraDisplayOrientation());
+                // Compress and resize the Bitmap to ensure it's below 300 KB
+                bitmap = compressAndResizeBitmap(bitmap, 100, 1024);
                 // Convert the Bitmap to a base64 encoded string
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
                 byte[] byteArray = byteArrayOutputStream.toByteArray();
-                String base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                String base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP);
                 // Create a DataURL
-                String dataUrl = "data:image/png;base64," + base64Image;
+                String dataUrl = "data:image/jpeg;base64," + base64Image;
                 SharedPreferenceManager.setImageData(context, dataUrl);
                 Log.e("Image", dataUrl);
+                ImageData = dataUrl;
                 camera.release();
                 camera = null;
                 binding.buttonCapture.setVisibility(View.INVISIBLE);
             }
     };
+    private int getCameraDisplayOrientation() {
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(getBackCameraId(), info);
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        int rotation = windowManager.getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 270;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 90;
+                break;
+        }
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360; // compensate the mirror
+        } else { // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+
+    private Bitmap rotateBitmap(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+    private int getBackCameraId() {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     private void retrieveLocation() {
         // Get the last known location
@@ -244,8 +328,11 @@ public class PunchInOutActivity extends AppCompatActivity {
                                     // Set the location name as the text of the TextView
                                     binding.locationData.setText(locationName);
                                     binding.locationData.setSelected(true);
-                                    Log.e("Location1", location.toString());
+
                                     Log.e("LocationName", locationName);
+                                    LocationData = locationName;
+                                    LocationCoordinates = ""+location.getLatitude()+","+location.getLongitude()+"";
+                                    Log.e("Location1", LocationCoordinates);
 
                                 }
                             } catch (IOException e) {
@@ -281,7 +368,7 @@ public class PunchInOutActivity extends AppCompatActivity {
 
             CameraPermissionGranted = true;
             // Initialize the camera
-            camera = getFrontFacingCamera();
+          camera = getFrontFacingCamera();
         }
     }
     private void requestLocationPermission(){
@@ -303,6 +390,13 @@ public class PunchInOutActivity extends AppCompatActivity {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
                 CameraPermissionGranted = true;
+                camera = getFrontFacingCamera();
+                if (camera != null) {
+                    mPreview = new CameraPreview(this, camera);
+                    binding.cameraPreview.addView(mPreview);
+                } else {
+                    // Handle the case where the camera is not available
+                }
             } else {
                 // Permission denied
                 CameraPermissionGranted = false;
@@ -348,6 +442,87 @@ public class PunchInOutActivity extends AppCompatActivity {
         }
     };
 
+    private void uploadData(){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(ApiConstants.K_USER_ID, SharedPreferenceManager.getUserId(context));
+            jsonObject.put(ApiConstants.K_ACTIVITY_TYPE, "IN");
+            jsonObject.put(ApiConstants.K_IMAGE_DATA, ImageData);
+            jsonObject.put(ApiConstants.K_LOCATION_DATA, LocationData);
+            jsonObject.put(ApiConstants.K_LOCATION_COORDINATE, LocationCoordinates);
+            jsonObject.put(ApiConstants.K_PUNCH_DATE_TIME, AssetUtils.getSystemDateTimeInFormat());
+            jsonObject.put(ApiConstants.K_DEVICE_ID, SharedPreferenceManager.getDeviceId(context));
+            punchIn(jsonObject, ApiConstants.M_USER_PUNCH_ACTIVITY,"Processing...");
+        } catch (JSONException e) {
+
+        }
+    }
+    private void punchIn(JSONObject jsonObject, String MethodName, String progressMessage){
+        AssetUtils.showProgress(context, progressMessage);
+
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(ApiConstants.API_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(ApiConstants.API_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(ApiConstants.API_TIMEOUT, TimeUnit.SECONDS)
+                .build();
+        Log.e("JSONBody", jsonObject.toString());
+        AndroidNetworking.post(ApiConstants.URL + MethodName).addJSONObjectBody(jsonObject)
+                .setTag("test")
+                .setPriority(Priority.LOW)
+                .setOkHttpClient(okHttpClient) // passing a custom okHttpClient
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject result) {
+                        hideProgressDialog();
+                        if (result != null) {
+                            try {
+                                Log.e("POSTINGRES", result.toString());
+                                String status = result.getString(ApiConstants.K_STATUS).trim();
+                                String message = result.getString(ApiConstants.K_MESSAGE).trim();
+                                if (status.equalsIgnoreCase("true")) {
+                                    hideProgressDialog();
+                                    setDefault();
+                                    finish();
+                                } else {
+                                    hideProgressDialog();
+                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            finish();
+                                        }
+                                    };
+                                    AssetUtils.showAlertDialogSpec(context,"", message, onClickListener);
+                                }
+                            } catch (JSONException e) {
+                                hideProgressDialog();
+                                AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.something_went_wrong_error));
+                            }
+                        } else {
+                            hideProgressDialog();
+                            AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.communication_error));
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        hideProgressDialog();
+                        Log.e("ERROR", anError.getErrorDetail());
+                        if (anError.getErrorDetail().equalsIgnoreCase("responseFromServerError")) {
+                            hideProgressDialog();
+                            AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.communication_error));
+                        } else if (anError.getErrorDetail().equalsIgnoreCase("connectionError")) {
+                            hideProgressDialog();
+                            AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.internet_error));
+                        } else {
+                            hideProgressDialog();
+                            AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.internet_error));
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -364,5 +539,11 @@ public class PunchInOutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+    private void setDefault(){
+        IsCaptured = false;
+        ImageData = "";
+        LocationData = "";
+        binding.locationData.setText("");
     }
 }

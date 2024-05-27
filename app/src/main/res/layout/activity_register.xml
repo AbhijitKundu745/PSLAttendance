@@ -13,17 +13,17 @@
         tools:context=".RegisterActivity"
         android:focusableInTouchMode="true">
         <ImageView
-            android:layout_width="200dp"
-            android:layout_height="50dp"
+            android:layout_width="300dp"
+            android:layout_height="80dp"
             android:layout_gravity="start"
             android:scaleType="fitXY"
             android:src="@drawable/banner"
             android:layout_marginTop="10dp"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="center"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:elevation="5dp"
@@ -31,50 +31,70 @@
             <TextView
                 style="@style/viewParent.headerText.NoMode"
                 android:textColor="@color/whiteTextColor"
-                android:text="Here’s your first\nstep with us! "
-                android:layout_gravity="start"
-                android:layout_marginStart="10dp"/>
+                android:text="Welcome to AttendEase\n\nCreate your account"
+                android:layout_gravity="start|top"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"/>
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_height="650dp"
+                android:layout_marginTop="80dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="10dp">
+                app:cardElevation="10dp"
+                android:layout_gravity="center">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_margin="5dp"
                     android:orientation="vertical">
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textInputName"
+                        android:id="@+id/textInputFirstName"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
                         style="@style/NoUnderlineTextInputLayout">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editTextName"
+                            android:id="@+id/editTextFirstName"
                             style="@style/modifiedEditText"
-                            android:hint="Name*"
+                            android:hint="First Name"
                             android:inputType="textPersonName"
                             android:letterSpacing="0.1"
                             android:maxLength="50"
                             android:maxLines="1"
                             android:textSize="15sp"/>
                     </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputLastName"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
+                        style="@style/NoUnderlineTextInputLayout">
 
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextLastName"
+                            style="@style/modifiedEditText"
+                            android:hint="Last Name"
+                            android:inputType="textPersonName"
+                            android:letterSpacing="0.1"
+                            android:maxLength="50"
+                            android:maxLines="1"
+                            android:textSize="15sp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
                         style="@style/NoUnderlineTextInputLayout">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextEmail"
                             style="@style/modifiedEditText"
                             android:inputType="textEmailAddress"
                             android:maxLines="1"
-                            android:hint="Email ID*"
+                            android:hint="Email ID"
                             android:letterSpacing="0.1"
                             android:maxLength="50"
                             android:textSize="15sp"/>
@@ -82,14 +102,15 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputMobile"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
                         style="@style/NoUnderlineTextInputLayout">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextMobile"
                             style="@style/modifiedEditText"
                             android:inputType="phone"
                             android:maxLines="1"
-                            android:hint="Mobile Number*"
+                            android:hint="Mobile Number"
                             android:letterSpacing="0.1"
                             android:maxLength="10"
                             android:textSize="15sp"/>
@@ -97,12 +118,13 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputPasswordEmpID"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
                         style="@style/NoUnderlineTextInputLayout">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextEmpID"
                             style="@style/modifiedEditText"
-                            android:hint="Employee ID*"
+                            android:hint="Employee ID"
                             android:maxLines="1"
                             android:inputType="text"
                             android:letterSpacing="0.1"
@@ -112,7 +134,8 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputPassword"
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.6"
                         style="@style/NoUnderlineTextInputLayout">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextPassword"
@@ -125,11 +148,31 @@
                             android:textColorHint="@color/primaryTextColor"
                             android:textSize="15sp"/>
                     </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_marginTop="6dp"
+                        style="@style/NoUnderlineTextInputLayout">
+                    <TextView
+                        android:id="@+id/searchableTextView"
+                        style="@style/modifiedEditText"
+                        android:hint="Select Location"
+                        android:textColorHint="@color/primaryTextColor"
+                        android:paddingLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:drawableEnd="@drawable/drop_down"
+                        android:drawableTint="@color/primaryTextColor"
+                        android:background="@drawable/bg_signup"
+                        android:textSize="15sp"
+                        />
+                    </com.google.android.material.textfield.TextInputLayout>
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginTop="20dp">
+    android:layout_marginTop="40dp">
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSignUp"
         android:layout_width="0dp"

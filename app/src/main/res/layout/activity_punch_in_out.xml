@@ -124,7 +124,8 @@
                     android:textSize="20sp"
                     android:elevation="20dp"
                     android:layout_gravity="center"
-                    android:layout_margin="5dp"/>
+                    android:layout_margin="5dp"
+                    android:foreground="?android:attr/selectableItemBackground"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

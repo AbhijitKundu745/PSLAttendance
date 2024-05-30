@@ -6,135 +6,144 @@
 
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-        android:background="@color/login_bk_color"
-    tools:context=".LoginActivity"
-        android:focusableInTouchMode="true">
-        <ImageView
-            android:layout_width="300dp"
-            android:layout_height="80dp"
-            android:layout_gravity="start"
-            android:scaleType="fitXY"
-            android:src="@drawable/banner"
-            android:layout_marginTop="10dp"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:focusableInTouchMode="true"
+        tools:context=".LoginActivity">
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/linearLayout3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_gravity="center">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="620dp"
-            android:layout_margin="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="10dp">
+            <ImageView
+                android:layout_width="300dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.1"
+                android:layout_gravity="start"
+                android:layout_marginTop="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/banner" />
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:orientation="vertical">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.5"
-                    android:src="@drawable/user_login"
-                    />
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.2"
-                    style="@style/NoUnderlineTextInputLayout"
-                    android:layout_marginTop="10dp">
+                android:layout_height="0dp"
+                android:layout_margin="20dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtUserName"
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        android:layout_marginTop="2dp"
-                        android:background="@drawable/edittext_white_background"
-                        android:drawableRight="@drawable/ic_user"
-                        android:drawableTint="@color/primaryTextColor"
-                        android:hint="Employee ID/Email ID/Mobile No"
-                        android:inputType="text"
-                        android:letterSpacing="0.1"
-                        android:maxLength="50"
-                        android:textColor="@color/primaryTextColor"
-                        android:textColorHint="@color/primaryTextColor"
-                        android:textSize="18sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.2"
-                    app:passwordToggleEnabled="true"
-                    app:passwordToggleTint="@color/primaryTextColor"
-                    style="@style/NoUnderlineTextInputLayout">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        android:layout_marginTop="2dp"
-                        android:background="@drawable/edttext_white_bg"
-                        android:hint="Password"
-                        android:inputType="textPassword"
-                        android:letterSpacing="0.1"
-                        android:maxLength="12"
-                        android:textColor="@color/primaryTextColor"
-                        android:textColorHint="@color/primaryTextColor"
-                        android:textSize="18sp"/>
-
-                </com.google.android.material.textfield.TextInputLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.15"
-                    android:orientation="horizontal">
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:id="@+id/chkRemember"
-                        android:layout_marginTop="5dp"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Remember Me"
-                        android:layout_height="match_parent"
-                        android:checkedButton="@color/primaryTextColor"
-                        android:textColor="@color/primaryTextColor"
-                        android:layout_gravity="center"
-                        android:gravity="center_vertical"
-                        />
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.5"
+                        android:src="@drawable/user_login" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/NoUnderlineTextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="0.2">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtUserName"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="2dp"
+                            android:background="@drawable/edittext_white_background"
+                            android:drawableRight="@drawable/ic_user"
+                            android:drawableTint="@color/primaryTextColor"
+                            android:hint="Employee ID/Email ID/Mobile No"
+                            android:inputType="text"
+                            android:letterSpacing="0.1"
+                            android:maxLength="50"
+                            android:textColor="@color/primaryTextColor"
+                            android:textColorHint="@color/primaryTextColor"
+                            android:textSize="18sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/NoUnderlineTextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.2"
+                        app:passwordToggleEnabled="true"
+                        app:passwordToggleTint="@color/primaryTextColor">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="2dp"
+                            android:background="@drawable/edttext_white_bg"
+                            android:hint="Password"
+                            android:inputType="textPassword"
+                            android:letterSpacing="0.1"
+                            android:maxLength="12"
+                            android:textColor="@color/primaryTextColor"
+                            android:textColorHint="@color/primaryTextColor"
+                            android:textSize="18sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.15"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/chkRemember"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="5dp"
+                            android:layout_weight="1"
+                            android:checkedButton="@color/primaryTextColor"
+                            android:gravity="center_vertical"
+                            android:text="Remember Me"
+                            android:textColor="@color/primaryTextColor" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnLogin"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_weight="0.1"
+                        android:background="@drawable/button_background_blue"
+                        android:text="Login"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/loginViewsMargin"
+                        android:onClick="onRegisterClick"
+                        android:text="New user? Register Now"
+                        android:textAlignment="center"
+                        android:textColor="@color/themeColor"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnLogin"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.1"
-                    android:textColor="@color/white"
-                    android:background="@drawable/button_background_blue"
-                    android:text="Login"
-                    android:layout_marginTop="20dp"/>
-
-                <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="@dimen/loginViewsMargin"
-                    android:onClick="onRegisterClick"
-                    android:text="New user? Register Now"
-                    android:textAlignment="center"
-                    android:textColor="@color/themeColor"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

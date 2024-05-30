@@ -5,7 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.psl.pslattendance.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -107,6 +112,19 @@ public class AssetUtils {
         }
         return dayOfWeek;
     }
+    public static String getSpecFormatDateTime(String datetime) {
+        String dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss";
+        String formattedDateTime  = "";
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat(dateTimePattern, Locale.getDefault());
+        try {
+            Date timeObj = timeFormat.parse(datetime);
+            formattedDateTime = timeObj.toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return formattedDateTime;
+    }
     static ProgressDialog progressDialog;
 
     /**
@@ -140,7 +158,8 @@ public class AssetUtils {
         // Create a new instance of the AlertDialog.Builder class
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title); //Set the title
-        builder.setMessage(message); //Set the message of the dialog
+        builder.setMessage(message);//Set the message of the dialog
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

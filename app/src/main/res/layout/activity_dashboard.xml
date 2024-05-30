@@ -5,235 +5,312 @@
     <data>
 
     </data>
-    <androidx.appcompat.widget.LinearLayoutCompat
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".RegisterActivity"
         android:background="@color/primaryTextColor"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        tools:context=".DashboardActivity">
+
         <LinearLayout
+            android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="10dp">
-            <TextView
-                android:id="@+id/userGreet"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Hello"
-                android:layout_margin="20dp"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:gravity="start|top"/>
-            <TextView
-                android:id="@+id/dateTime"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:layout_gravity="end|top"
-                android:textAlignment="textEnd"/>
-        </LinearLayout>
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="10dp"
-            android:layout_gravity="center">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DASHBOARD"
-                android:textColor="@color/primaryTextColor"
-                android:textAlignment="center"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginTop="20dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:orientation="vertical"
-                android:layout_gravity="start"
-                android:layout_marginTop="100dp"
-                android:gravity="center">
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnpnchIN"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:layout_margin="10dp"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/userGreet"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="20dp"
+                    android:layout_weight="1"
+                    android:gravity="start|top"
+                    android:text="Hello"
                     android:textColor="@color/white"
-                    android:background="@drawable/round_button_green"
-                    android:text="IN"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    android:layout_margin="5dp"
-                    android:foreground="?android:attr/selectableItemBackground"/>
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnpnchOUT"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dateTime"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end|top"
+                    android:layout_margin="20dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textAlignment="textEnd"
                     android:textColor="@color/white"
-                    android:background="@drawable/round_button_green"
-                    android:text="OUT"
-                    android:textStyle="bold"
                     android:textSize="20sp"
-                    android:layout_margin="5dp"
-                    android:foreground="?android:attr/selectableItemBackground"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
                 android:layout_margin="10dp"
-                app:cardBackgroundColor="#EAFFFC"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="10dp">
+
                 <LinearLayout
-                    android:id="@+id/linearReport"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-                    <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="50dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnpnchIN"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.3"
                         android:layout_margin="5dp"
-                        android:orientation="horizontal">
+                        android:background="@drawable/round_button_green"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:text="IN"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/textDay"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textColor="@color/orange"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textAlignment="center"
-                            android:gravity="center"/>
-
-                        <View
-                            android:layout_width="2dp"
-                            android:layout_height="match_parent"/>
-
-                        <TextView
-                            android:id="@+id/textActivity"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="#550000"
-                            android:textAlignment="center"
-                            android:gravity="center"/>
-
-                        <View
-                            android:layout_width="2dp"
-                            android:layout_height="match_parent"/>
-
-                        <TextView
-                            android:id="@+id/textDate"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textColor="@color/orange"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textAlignment="center"
-                            android:gravity="center"/>
-                    </LinearLayout>
-                    <LinearLayout
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnpnchOUT"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.3"
                         android:layout_margin="5dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/textPnchIn"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:text="Check In"
-                            android:textAlignment="center"
-                            android:gravity="center"
-                            android:textColor="@color/black"/>
-
-                        <View
-                            android:layout_width="2dp"
-                            android:layout_height="match_parent"/>
-
-                        <TextView
-                            android:id="@+id/textInDate"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textAlignment="center"
-                            android:gravity="center"
-                            android:textColor="@color/black"/>
-                    </LinearLayout>
-                    <LinearLayout
+                        android:background="@drawable/round_button_green"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:text="OUT"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_margin="5dp"
-                        android:orientation="horizontal">
+                        android:layout_height="0dp"
+                        android:layout_weight="0.5"/>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:layout_gravity="bottom"
+                        android:layout_margin="10dp"
+                        app:cardBackgroundColor="#EAFFFC"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="10dp">
 
-                        <TextView
-                            android:id="@+id/textPnchOut"
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:id="@+id/linearReport"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:text="Check Out"
-                            android:textAlignment="center"
-                            android:gravity="center"
-                            android:textColor="@color/black"/>
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/textActivity"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="0.5"
+                                android:gravity="center"
+                                android:textAlignment="center"
+                                android:textColor="@color/wine"
+                                android:textSize="18sp"
+                                android:layout_margin="5dp"
+                                android:background="@drawable/box_bg"
+                                android:textStyle="bold"
+                                android:visibility="gone"/>
+                            <LinearLayout
+                                android:id="@+id/linearInReport"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="2"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="0.8"
+                                    android:layout_margin="5dp"
+                                    android:orientation="horizontal">
 
-                        <View
-                            android:layout_width="2dp"
-                            android:layout_height="match_parent"/>
+                                    <TextView
+                                        android:id="@+id/textInDay"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/orange"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold"
+                                        android:background="@drawable/box_bg"/>
 
-                        <TextView
-                            android:id="@+id/textOutDate"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textAlignment="center"
-                            android:gravity="center"
-                            android:textColor="@color/black"/>
-                    </LinearLayout>
+                                    <View
+                                        android:layout_width="3dp"
+                                        android:layout_height="match_parent" />
+
+                                    <TextView
+                                        android:id="@+id/textInDate"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/orange"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold"
+                                        android:background="@drawable/box_bg"/>
+
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_margin="5dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/textPnchIn"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="Check In"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/black"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:background="@drawable/box_bg"/>
+
+                                    <View
+                                        android:layout_width="2dp"
+                                        android:layout_height="match_parent" />
+
+                                    <TextView
+                                        android:id="@+id/textInTime"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/black"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        android:background="@drawable/box_bg"/>
+                                </LinearLayout>
+                            </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/linearOutReport"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="0.8"
+                                android:layout_margin="5dp"
+                                android:orientation="horizontal"
+                                >
+
+                                <TextView
+                                    android:id="@+id/textOutDay"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/orange"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/box_bg"/>
+
+                                <View
+                                    android:layout_width="3dp"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:id="@+id/textOutDate"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/orange"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/box_bg"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:layout_margin="5dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/textPnchOut"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:text="Check Out"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/black"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/box_bg"/>
+
+                                <View
+                                    android:layout_width="2dp"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:id="@+id/textOutTime"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/black"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/box_bg"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
-
 
             </androidx.cardview.widget.CardView>
 
-
-        </androidx.cardview.widget.CardView>
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="center"
-            android:paddingBottom="5dp"
-            android:text="@string/footer"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_margin="5dp"
-            android:textSize="12sp"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:paddingBottom="5dp"
+                android:text="@string/footer"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

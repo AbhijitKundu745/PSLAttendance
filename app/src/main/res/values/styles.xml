@@ -39,8 +39,6 @@
     </style>
 
     <style name="modifiedEditText" parent="parent">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">60dp</item>\
         <item name="android:textColor">#11CFC5</item>
         <item name="android:background">@drawable/bg_signup</item>
     </style>

@@ -139,12 +139,12 @@ public class LoginActivity extends AppCompatActivity {
                                     }
 
                                 } else {
-                                    AssetUtils.showAlertDialog(context,"", message);
+                                    AssetUtils.showAlertDialog(context, "Invalid Credential", getResources().getString(R.string.login_data_validation));
                                     hideProgressDialog();
                                 }
                             } catch (JSONException e) {
                                 hideProgressDialog();
-                                AssetUtils.showAlertDialog(context,"", getResources().getString(R.string.something_went_wrong_error));
+                                AssetUtils.showAlertDialog(context,"Invalid Credential", getResources().getString(R.string.login_data_validation));
                             }
                         } else {
                             hideProgressDialog();

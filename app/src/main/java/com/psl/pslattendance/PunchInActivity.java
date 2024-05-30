@@ -137,7 +137,7 @@ if(IsCaptured){
                 handler.postDelayed(this, 5000);
             }
         };
-        handler.postDelayed(runnable, 5000);
+        handler.postDelayed(runnable, 1000);
 
         binding.userGreet.setText(SharedPreferenceManager.getUserFirstname(context));
 
@@ -208,7 +208,7 @@ if(IsCaptured){
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    IsCaptured = true;
+
                     camera.takePicture(null, null, PictureCallback);
                 }
             }).start();
@@ -249,9 +249,12 @@ if(IsCaptured){
                 SharedPreferenceManager.setImageData(context, dataUrl);
                 Log.e("Image", dataUrl);
                 ImageData = dataUrl;
-                camera.release();
-                camera = null;
+                IsCaptured = true;
                 binding.buttonCapture.setVisibility(View.INVISIBLE);
+                if(IsCaptured){
+                    camera.release();
+                }
+                camera = null;
             }
     };
     private int getCameraDisplayOrientation() {
@@ -452,6 +455,7 @@ if(IsCaptured){
             jsonObject.put(ApiConstants.K_LOCATION_COORDINATE, LocationCoordinates);
             jsonObject.put(ApiConstants.K_PUNCH_DATE_TIME, AssetUtils.getSystemDateTimeInFormat());
             jsonObject.put(ApiConstants.K_DEVICE_ID, SharedPreferenceManager.getDeviceId(context));
+            jsonObject.put(ApiConstants.K_TRANS_ID, SharedPreferenceManager.getTransId(context));
             punchIn(jsonObject, ApiConstants.M_USER_PUNCH_ACTIVITY,"Processing...");
         } catch (JSONException e) {
 
@@ -482,6 +486,9 @@ if(IsCaptured){
                                 String message = result.getString(ApiConstants.K_MESSAGE).trim();
                                 if (status.equalsIgnoreCase("true")) {
                                     hideProgressDialog();
+                                    SharedPreferenceManager.setIsCheckedIn(context, true);
+                                    SharedPreferenceManager.setOutDateTime(context, "");
+                                    SharedPreferenceManager.setIsFullChecked(context, false);
                                     setDefault();
                                     finish();
                                 } else {
@@ -531,7 +538,9 @@ if(IsCaptured){
 
     @Override
     protected void onDestroy() {
-        camera.release();
+        if(IsCaptured){
+            camera.release();
+        }
         IsCaptured = false;
         super.onDestroy();
     }

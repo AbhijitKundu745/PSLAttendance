@@ -27,5 +27,8 @@
     <color name="transparent">#00000000</color>
     <color name="orange">#F56E25</color>
     <color name="green1">#22008000</color>
+    <color name="perano">#ADBCE6</color>
+    <color name="ice_cold">#ADE6D8</color>
+    <color name="wine">#550000</color>
 
 </resources>

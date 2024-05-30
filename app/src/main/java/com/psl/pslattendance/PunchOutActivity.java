@@ -135,7 +135,7 @@ ActivityPunchOutBinding binding;
 
         binding.userGreet.setText(SharedPreferenceManager.getUserFirstname(context));
 
-        binding.btnPunchIn.setOnClickListener(new View.OnClickListener() {
+        binding.btnPunchOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(IsCaptured){
@@ -443,6 +443,7 @@ ActivityPunchOutBinding binding;
             jsonObject.put(ApiConstants.K_LOCATION_COORDINATE, LocationCoordinates);
             jsonObject.put(ApiConstants.K_PUNCH_DATE_TIME, AssetUtils.getSystemDateTimeInFormat());
             jsonObject.put(ApiConstants.K_DEVICE_ID, SharedPreferenceManager.getDeviceId(context));
+            jsonObject.put(ApiConstants.K_TRANS_ID, SharedPreferenceManager.getTransId(context));
             punchIn(jsonObject, ApiConstants.M_USER_PUNCH_ACTIVITY,"Processing...");
         } catch (JSONException e) {
 

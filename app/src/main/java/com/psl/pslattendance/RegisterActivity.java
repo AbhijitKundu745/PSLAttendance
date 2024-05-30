@@ -75,9 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
         androidID = androidID.toUpperCase();
         SharedPreferenceManager.setDeviceId(context, androidID);
         Log.e("DEVICEID", androidID);
-
         getLocationDetails();
-
         binding.btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,12 +85,17 @@ public class RegisterActivity extends AppCompatActivity {
         binding.btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirstName = binding.editTextFirstName.getText().toString().trim();
-                LastName = binding.editTextLastName.getText().toString().trim();
+                FirstName = binding.editTextFirstName.getText().toString().trim().toUpperCase();
+                LastName = binding.editTextLastName.getText().toString().trim().toUpperCase();
                 EmailID = binding.editTextEmail.getText().toString().trim();
                 Contact = binding.editTextMobile.getText().toString().trim();
-                EmpID = binding.editTextEmpID.getText().toString().trim();
-                Password = binding.editTextPassword.getText().toString().trim();
+                EmpID = binding.editTextEmpID.getText().toString().trim().toUpperCase();
+                if(binding.editTextPassword.getText().toString().length()<8){
+                    AssetUtils.showAlertDialog(context,"", "Password must be at least 8 characters long");
+                }
+                else {
+                    Password = binding.editTextPassword.getText().toString().trim();
+                }
                 Location = binding.searchableTextView.getText().toString().trim();
                 if (!TextUtils.isEmpty(FirstName)) {
                     if (!TextUtils.isEmpty(LastName)) {
@@ -148,7 +151,7 @@ public class RegisterActivity extends AppCompatActivity {
                 dialog.setContentView(R.layout.dialog_searchable_spinner);
 
                 // set custom height and width
-                dialog.getWindow().setLayout(650, 800);
+                dialog.getWindow().setLayout(800, 800);
 
                 // set transparent background
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -187,12 +190,14 @@ public class RegisterActivity extends AppCompatActivity {
                 });
             }
         });
+
     }
 
     public void onLoginClick(View View) {
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(intent);
     }
+
 
     private void userRegister(JSONObject registerJson, String METHODNAME, String progreesMess) {
         AssetUtils.showProgress(context, progreesMess);

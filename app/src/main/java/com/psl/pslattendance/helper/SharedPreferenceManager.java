@@ -17,6 +17,10 @@ public class SharedPreferenceManager {
     private static final String LOCATION_NAME = "LOCATION_NAME";
     private static final String CAMERA_PERMISSION = "CAMERA_PERMISSION";
     private static final String LOCATION_PERMISSION = "LOCATION_PERMISSION";
+    private static final String TRANS_ID = "TRANS_ID";
+    private static final String IS_CHECKED_IN = "IS_CHECKED_IN";
+    private static final String IS_FULL_CHECKED = "IS_FULL_CHECKED";
+    private static final String OUT_DATE_TIME = "OUT_DATE_TIME";
 
     private SharedPreferenceManager() {} // prevent instantiation
     private static SharedPreferences getSharedPreferences(Context context) {
@@ -140,6 +144,48 @@ public class SharedPreferenceManager {
         SharedPreferences prefs = getSharedPreferences(context);
         synchronized (prefs) {
             prefs.edit().putBoolean(LOCATION_PERMISSION, newValue).apply();
+        }
+    }
+    public static String getTransId(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getString(TRANS_ID, "3B678469-FFF5-43A1-BB73-566648BCA5A0");
+    }
+
+    public static void setTransId(Context context, String newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putString(TRANS_ID, newValue).apply();
+        }
+    }
+    public static boolean getIsCheckedIn(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getBoolean(IS_CHECKED_IN, false);
+    }
+    public static void setIsCheckedIn(Context context, boolean newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putBoolean(IS_CHECKED_IN, newValue).apply();
+        }
+    }
+    public static boolean getIsFullChecked(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getBoolean(IS_FULL_CHECKED, false);
+    }
+    public static void setIsFullChecked(Context context, boolean newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putBoolean(IS_FULL_CHECKED, newValue).apply();
+        }
+    }
+    public static String getOutDateTime(Context context) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        return prefs.getString(OUT_DATE_TIME, "");
+    }
+
+    public static void setOutDateTime(Context context, String newValue) {
+        SharedPreferences prefs = getSharedPreferences(context);
+        synchronized (prefs) {
+            prefs.edit().putString(OUT_DATE_TIME, newValue).apply();
         }
     }
 }

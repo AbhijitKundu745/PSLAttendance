@@ -2,6 +2,7 @@ package com.psl.pslattendance;
 
 import static com.psl.pslattendance.helper.AssetUtils.hideProgressDialog;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,6 +11,7 @@ import androidx.databinding.DataBindingUtil;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -22,6 +24,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Surface;
@@ -32,12 +35,18 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.psl.pslattendance.databinding.ActivityPunchOutBinding;
 import com.psl.pslattendance.helper.ApiConstants;
 import com.psl.pslattendance.helper.AssetUtils;
@@ -97,11 +106,6 @@ ActivityPunchOutBinding binding;
             }
         }
 
-        if (LocationPermissionGranted) {
-            retrieveLocation();
-        }
-        mPreview = new CameraPreview(this, camera);
-        binding.cameraPreview.addView(mPreview);
         if(IsCaptured){
             binding.buttonCapture.setVisibility(View.GONE);
         } else{
@@ -131,7 +135,7 @@ ActivityPunchOutBinding binding;
                 handler.postDelayed(this, 5000);
             }
         };
-        handler.postDelayed(runnable, 5000);
+        handler.postDelayed(runnable, 1000);
 
         binding.userGreet.setText(SharedPreferenceManager.getUserFirstname(context));
 
@@ -139,7 +143,15 @@ ActivityPunchOutBinding binding;
             @Override
             public void onClick(View v) {
                 if(IsCaptured){
-                    uploadData();
+                    if(!TextUtils.isEmpty(LocationData)){
+                        uploadData();
+                    }
+                    else {
+                        AssetUtils.showAlertDialog(context, "", "Please enable your location permission");
+                    }
+                }
+                else {
+                    AssetUtils.showAlertDialog(context, "", "Please capture your Image");
                 }
             }
         });
@@ -199,7 +211,6 @@ ActivityPunchOutBinding binding;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    IsCaptured = true;
                     camera.takePicture(null, null, PictureCallback);
                 }
             }).start();
@@ -240,9 +251,12 @@ ActivityPunchOutBinding binding;
             SharedPreferenceManager.setImageData(context, dataUrl);
             Log.e("Image", dataUrl);
             ImageData = dataUrl;
-            camera.release();
-            camera = null;
-            binding.buttonCapture.setVisibility(View.INVISIBLE);
+            IsCaptured = true;
+            binding.buttonCapture.setVisibility(View.GONE);
+            if (camera!= null) {
+                camera.release();
+                camera = null;
+            }
         }
     };
     private int getCameraDisplayOrientation() {
@@ -331,17 +345,50 @@ ActivityPunchOutBinding binding;
                             }
                         } else {
                             // Request location updates
-                            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
-                                return;
-                            }
-                            fusedLocationClient.requestLocationUpdates(new LocationRequest(), locationCallback, Looper.getMainLooper());
+                            LocationRequest locationRequest = LocationRequest.create();
+                            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                            locationRequest.setInterval(1000);
+                            locationRequest.setFastestInterval(500);
+
+                            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                                    .addLocationRequest(locationRequest);
+
+                            SettingsClient settingsClient = LocationServices.getSettingsClient(context);
+                            Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+                            task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+                                @Override
+                                public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                                    // GPS is enabled, request location updates
+                                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        // TODO: Consider calling
+                                        //    ActivityCompat#requestPermissions
+                                        // here to request the missing permissions, and then overriding
+                                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                        //                                          int[] grantResults)
+                                        // to handle the case where the user grants the permission. See the documentation
+                                        // for ActivityCompat#requestPermissions for more details.
+
+                                        return;
+                                    }
+                                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+                                }
+                            });
+
+                            task.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    if (e instanceof ResolvableApiException) {
+                                        // GPS is disabled, show a dialog to the user asking them to enable GPS
+                                        ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                                        try {
+                                            resolvableApiException.startResolutionForResult(PunchOutActivity.this, REQUEST_LOCATION_PERMISSION);
+                                        } catch (IntentSender.SendIntentException ex) {
+                                            ex.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -360,10 +407,16 @@ ActivityPunchOutBinding binding;
             CameraPermissionGranted = true;
             // Initialize the camera
             camera = getFrontFacingCamera();
+            if (camera!= null) {
+                mPreview = new CameraPreview(this, camera);
+                binding.cameraPreview.addView(mPreview);
+            } else {
+                // Handle the case where the camera is not available
+            }
         }
     }
     private void requestLocationPermission(){
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -425,6 +478,7 @@ ActivityPunchOutBinding binding;
                         Log.e("Location2", location.toString());
                         Log.e("LocationName2", locationName);
 
+                        LocationData = locationName;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -523,19 +577,42 @@ ActivityPunchOutBinding binding;
 
     @Override
     protected void onDestroy() {
-        camera.release();
+        if (camera != null) {
+            camera.release();
+            camera = null;
+        }
         IsCaptured = false;
         super.onDestroy();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
     private void setDefault(){
         IsCaptured = false;
         ImageData = "";
         LocationData = "";
         binding.locationData.setText("");
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (LocationPermissionGranted) {
+            retrieveLocation();
+        }
+        if (CameraPermissionGranted) {
+            camera = getFrontFacingCamera();
+            if (camera!= null) {
+                mPreview = new CameraPreview(this, camera);
+                binding.cameraPreview.addView(mPreview);
+            } else {
+                // Handle the case where the camera is not available
+            }
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (camera!= null) {
+            camera.release();
+            camera = null;
+        }
     }
 }

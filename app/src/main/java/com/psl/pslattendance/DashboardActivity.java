@@ -75,7 +75,6 @@ ActivityDashboardBinding binding;
                 Log.e("MoreThan8",IsMoreThan8Hours.toString());
                 if(IsMoreThan8Hours){
                         setDefault();
-                        SharedPreferenceManager.setIsCheckedIn(context, true);
                         SharedPreferenceManager.setOutDateTime(context, "");
                         Intent intent = new Intent(DashboardActivity.this, PunchInActivity.class);
                         startActivity(intent);
@@ -317,45 +316,78 @@ private void getActivityDetails(){
             AssetUtils.showAlertDialog(context, "", getResources().getString(R.string.something_went_wrong_error));
         }
     }
-    public boolean isTimeDifferenceGreaterThanEightHours() {
-        boolean retVal = false;
-        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
-            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
-            Instant outInstant = outDateTime1.toInstant();
-            Instant inInstant = inDateTime1.toInstant();
-            Duration duration = Duration.between(inInstant, outInstant);
-            retVal =  duration.toMinutes() > 475;
-        }
-        return retVal;
+//    public boolean isTimeDifferenceGreaterThanEightHours() {
+//        boolean retVal = false;
+//        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
+//            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+//            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
+//            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
+//            Instant outInstant = outDateTime1.toInstant();
+//            Instant inInstant = inDateTime1.toInstant();
+//            Duration duration = Duration.between(inInstant, outInstant);
+//            retVal =  duration.toMinutes() > 475;
+//        }
+//        return retVal;
+//    }
+public boolean isTimeDifferenceGreaterThanEightHours() {
+    boolean retVal = false;
+    if (InDateTime != null && SharedPreferenceManager.getOutDateTime(context) != "") {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime outDateTime = LocalDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter);
+        LocalDateTime inDateTime = LocalDateTime.parse(InDateTime, formatter);
+        Duration duration = Duration.between(inDateTime, outDateTime);
+        retVal = duration.toMinutes() > 475;
     }
-    public boolean isTimeDifferenceGreaterThanFourHours() {
-        boolean retVal = false;
-        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
-            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
-            Instant outInstant = outDateTime1.toInstant();
-            Instant inInstant = inDateTime1.toInstant();
-            Duration duration = Duration.between(inInstant, outInstant);
-            retVal =  duration.toHours() >= 4;
-        }
-        return retVal;
+    return retVal;
+}
+//    public boolean isTimeDifferenceGreaterThanFourHours() {
+//        boolean retVal = false;
+//        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
+//            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+//            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
+//            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
+//            Instant outInstant = outDateTime1.toInstant();
+//            Instant inInstant = inDateTime1.toInstant();
+//            Duration duration = Duration.between(inInstant, outInstant);
+//            retVal =  duration.toHours() >= 4;
+//        }
+//        return retVal;
+//    }
+public boolean isTimeDifferenceGreaterThanFourHours() {
+    boolean retVal = false;
+    if (InDateTime != null && SharedPreferenceManager.getOutDateTime(context) != "") {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime outDateTime = LocalDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter);
+        LocalDateTime inDateTime = LocalDateTime.parse(InDateTime, formatter);
+        Duration duration = Duration.between(inDateTime, outDateTime);
+        retVal = duration.toHours() >= 4;
     }
-    public boolean isTimeDifferenceLessThanFourHours() {
-        boolean retVal = false;
-        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
-            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
-            Instant outInstant = outDateTime1.toInstant();
-            Instant inInstant = inDateTime1.toInstant();
-            Duration duration = Duration.between(inInstant, outInstant);
-            retVal =  duration.toHours() < 4;
-        }
-        return retVal;
+    return retVal;
+}
+//    public boolean isTimeDifferenceLessThanFourHours() {
+//        boolean retVal = false;
+//        if(InDateTime!=null && SharedPreferenceManager.getOutDateTime(context)!=""){
+//            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+//            OffsetDateTime outDateTime1 = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
+//            OffsetDateTime inDateTime1 = OffsetDateTime.parse(InDateTime, formatter.withZone(ZoneOffset.UTC));
+//            Instant outInstant = outDateTime1.toInstant();
+//            Instant inInstant = inDateTime1.toInstant();
+//            Duration duration = Duration.between(inInstant, outInstant);
+//            retVal =  duration.toHours() < 4;
+//        }
+//        return retVal;
+//    }
+public boolean isTimeDifferenceLessThanFourHours() {
+    boolean retVal = false;
+    if (InDateTime != null && SharedPreferenceManager.getOutDateTime(context) != "") {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime outDateTime = LocalDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter);
+        LocalDateTime inDateTime = LocalDateTime.parse(InDateTime, formatter);
+        Duration duration = Duration.between(inDateTime, outDateTime);
+        retVal = duration.toHours() < 4;
     }
+    return retVal;
+}
     private void setDefault(){
         SharedPreferenceManager.setIsCheckedIn(context, false);
         SharedPreferenceManager.setIsFullChecked(context, false);
@@ -372,22 +404,34 @@ private void getActivityDetails(){
         SharedPreferenceManager.setOutDateTime(context, "");
         InDateTime = null;
     }
-    private boolean IsMoreThan8Hours(){
+//    private boolean IsMoreThan8Hours(){
+//        boolean retVal = false;
+//        if(SharedPreferenceManager.getOutDateTime(context)!=""){
+//            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+//            OffsetDateTime outDateTime = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
+//            // Convert outDateTime to ZonedDateTime in the local system time zone
+//            Instant outInstant = outDateTime.toInstant();
+//            LocalDateTime currentDateTime = LocalDateTime.now();
+//            String formattedDateTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+//            OffsetDateTime currentTime1 = OffsetDateTime.parse(formattedDateTime, formatter.withZone(ZoneOffset.UTC));
+//            Instant currentTime = currentTime1.toInstant();
+//            Log.e("OutInstant", outInstant.toString());
+//            Log.e("currentTimeInstant", currentTime.toString());
+//            Duration duration = Duration.between(outInstant, currentTime);
+//            Log.e("Duration", duration.toString());
+//            retVal =  duration.toMinutes() > 475;
+//        }
+//        return retVal;
+//    }
+    public boolean IsMoreThan8Hours() {
         boolean retVal = false;
-        if(SharedPreferenceManager.getOutDateTime(context)!=""){
+        if (SharedPreferenceManager.getOutDateTime(context) != "") {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            OffsetDateTime outDateTime = OffsetDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter.withZone(ZoneOffset.UTC));
-            // Convert outDateTime to ZonedDateTime in the local system time zone
-            Instant outInstant = outDateTime.toInstant();
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            String formattedDateTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-            OffsetDateTime currentTime1 = OffsetDateTime.parse(formattedDateTime, formatter.withZone(ZoneOffset.UTC));
-            Instant currentTime = currentTime1.toInstant();
-            Log.e("OutInstant", outInstant.toString());
-            Log.e("currentTimeInstant", currentTime.toString());
-            Duration duration = Duration.between(outInstant, currentTime);
-            Log.e("Duration", duration.toString());
-            retVal =  duration.toMinutes() > 475;
+            LocalDateTime outDateTime = LocalDateTime.parse(SharedPreferenceManager.getOutDateTime(context), formatter);
+            LocalDateTime inDateTime = LocalDateTime.now();
+            Duration duration = Duration.between(inDateTime, outDateTime);
+            retVal = duration.toMinutes() >475;
+            Log.e("MoreThan8", duration.toString());
         }
         return retVal;
     }

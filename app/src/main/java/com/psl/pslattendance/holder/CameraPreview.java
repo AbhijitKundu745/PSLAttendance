@@ -15,6 +15,7 @@ import java.io.IOException;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private Surface mSurface;
     private boolean IsCameraPreviewStarted = false;
 
 
@@ -32,11 +33,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        if (mCamera != null && !IsCameraPreviewStarted) {
+        if (mCamera != null && !IsCameraPreviewStarted && holder.getSurface()!=null) {
             try {
-                mCamera.setPreviewDisplay(mHolder);
-                mCamera.startPreview();
-                IsCameraPreviewStarted = true;
+                    mCamera.setPreviewDisplay(mHolder);
+                    mCamera.startPreview();
+                    IsCameraPreviewStarted = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -50,17 +51,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e) {
-            Log.e("TAG", "Error stopping camera preview", e);
-        }
-
-        try {
-            mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
-        } catch (Exception e) {
-            Log.e("TAG", "Error setting camera preview", e);
+        Surface surface = mHolder.getSurface();
+        if (mSurface == null || !mSurface.equals(surface)) {
+            mSurface = surface;
+            try {
+                if (mCamera!= null) {
+                    mCamera.stopPreview();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error stopping camera preview", e);
+            }
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting camera preview", e);
+            }
         }
     }
     @Override

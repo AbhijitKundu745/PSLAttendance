@@ -90,40 +90,40 @@ public class RegisterActivity extends AppCompatActivity {
                 EmailID = binding.editTextEmail.getText().toString().trim();
                 Contact = binding.editTextMobile.getText().toString().trim();
                 EmpID = binding.editTextEmpID.getText().toString().trim().toUpperCase();
-                if(binding.editTextPassword.getText().toString().length()<8){
-                    AssetUtils.showAlertDialog(context,"", "Password must be at least 8 characters long");
-                }
-                else {
-                    Password = binding.editTextPassword.getText().toString().trim();
-                }
+                Password = binding.editTextPassword.getText().toString().trim();
                 Location = binding.searchableTextView.getText().toString().trim();
+                Log.e("SearchLocation", Location);
                 if (!TextUtils.isEmpty(FirstName)) {
                     if (!TextUtils.isEmpty(LastName)) {
                         if (!TextUtils.isEmpty(EmailID)) {
                             if (!TextUtils.isEmpty(Contact)) {
                                 if (!TextUtils.isEmpty(EmpID)) {
-                                    if (!TextUtils.isEmpty(Password)) {
-                                        if (!Location.equalsIgnoreCase(default_source_item)) {
-                                            try {
-                                                JSONObject jsonObject = new JSONObject();
-                                                jsonObject.put(ApiConstants.K_FIRST_NAME, FirstName);
-                                                jsonObject.put(ApiConstants.K_LAST_NAME, LastName);
-                                                jsonObject.put(ApiConstants.K_EMAIL, EmailID);
-                                                jsonObject.put(ApiConstants.K_CONTACT, Contact);
-                                                jsonObject.put(ApiConstants.K_EMP_ID, EmpID);
-                                                jsonObject.put(ApiConstants.K_PASSWORD, Password);
-                                                jsonObject.put(ApiConstants.K_LOCATION_NAME, Location);
-                                                jsonObject.put(ApiConstants.K_DEVICE_ID, SharedPreferenceManager.getDeviceId(context));
-                                                userRegister(jsonObject, ApiConstants.M_USER_REG, "Processing...");
-                                            } catch (JSONException e) {
+                                    if (!TextUtils.isEmpty(Location)&&!Location.equalsIgnoreCase(default_source_item)) {
+                                        if (!TextUtils.isEmpty(Password)) {
+                                            if (binding.editTextPassword.getText().toString().length() < 8) {
+                                                AssetUtils.showAlertDialog(context, "", "Password must be at least 8 characters long");
+                                            } else {
+                                                try {
+                                                    JSONObject jsonObject = new JSONObject();
+                                                    jsonObject.put(ApiConstants.K_FIRST_NAME, FirstName);
+                                                    jsonObject.put(ApiConstants.K_LAST_NAME, LastName);
+                                                    jsonObject.put(ApiConstants.K_EMAIL, EmailID);
+                                                    jsonObject.put(ApiConstants.K_CONTACT, Contact);
+                                                    jsonObject.put(ApiConstants.K_EMP_ID, EmpID);
+                                                    jsonObject.put(ApiConstants.K_PASSWORD, Password);
+                                                    jsonObject.put(ApiConstants.K_LOCATION_NAME, Location);
+                                                    jsonObject.put(ApiConstants.K_DEVICE_ID, SharedPreferenceManager.getDeviceId(context));
+                                                    userRegister(jsonObject, ApiConstants.M_USER_REG, "Processing...");
+                                                } catch (JSONException e) {
 
+                                                }
                                             }
-                                        }  else {
-                                            AssetUtils.showAlertDialog(context, "Location Required", "Please enter above details first");
+                                        } else {
+                                            AssetUtils.showAlertDialog(context, "Password Required", "Please enter your Password");
                                         }
                                     } else {
-                                        AssetUtils.showAlertDialog(context, "Password Required", "Please enter your Password");
-                                    }
+                                            AssetUtils.showAlertDialog(context, "Location Required", "Please select your location");
+                                        }
                                 } else {
                                     AssetUtils.showAlertDialog(context, "Employee ID Required", "Please enter your Employee ID");
                                 }

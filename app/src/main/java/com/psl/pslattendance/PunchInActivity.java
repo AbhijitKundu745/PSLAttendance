@@ -3,6 +3,7 @@ package com.psl.pslattendance;
 
 import static com.psl.pslattendance.helper.AssetUtils.hideProgressDialog;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -11,6 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,10 +22,10 @@ import android.hardware.Camera;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Surface;
@@ -35,12 +37,19 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.tasks.Task;
 import com.psl.pslattendance.databinding.ActivityPunchInOutBinding;
 import com.psl.pslattendance.helper.ApiConstants;
 import com.psl.pslattendance.helper.AssetUtils;
@@ -69,7 +78,7 @@ public class PunchInActivity extends AppCompatActivity {
     private boolean CameraPermissionGranted = false;
     private boolean LocationPermissionGranted = true;
     private boolean IsCaptured = false;
-    String ImageData= null;
+    String ImageData = null;
     String LocationData = null;
     String LocationCoordinates = null;
 
@@ -85,15 +94,15 @@ public class PunchInActivity extends AppCompatActivity {
         // Request location permission
         requestLocationPermission();
         setDefault();
-        if(SharedPreferenceManager.getCameraPermission(context)){
+        if (SharedPreferenceManager.getCameraPermission(context)) {
             Log.e("PermCamera", SharedPreferenceManager.getCameraPermission(context).toString());
             CameraPermissionGranted = true;
         }
-        if(SharedPreferenceManager.getLocationPermission(context)){
+        if (SharedPreferenceManager.getLocationPermission(context)) {
             Log.e("PermLoc", SharedPreferenceManager.getLocationPermission(context).toString());
             LocationPermissionGranted = true;
         }
-        if(CameraPermissionGranted){
+        if (CameraPermissionGranted) {
             camera = getFrontFacingCamera();
             if (camera != null) {
                 mPreview = new CameraPreview(this, camera);
@@ -102,25 +111,19 @@ public class PunchInActivity extends AppCompatActivity {
                 // Handle the case where the camera is not available
             }
         }
-
-        if (LocationPermissionGranted) {
-            retrieveLocation();
+        if (IsCaptured) {
+            binding.buttonCapture.setVisibility(View.GONE);
+        } else {
+            binding.buttonCapture.setVisibility(View.VISIBLE);
         }
-        mPreview = new CameraPreview(this, camera);
-        binding.cameraPreview.addView(mPreview);
-if(IsCaptured){
-    binding.buttonCapture.setVisibility(View.GONE);
-} else{
-    binding.buttonCapture.setVisibility(View.VISIBLE);
-}
         // Set up the capture button
         binding.buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (CameraPermissionGranted) {
-                        takePicture();
+                    takePicture();
                 } else {
-                    AssetUtils.showAlertDialog(context, "Access Error","Please allow the camera");
+                    AssetUtils.showAlertDialog(context, "Access Error", "Please allow the camera");
                 }
             }
         });
@@ -144,10 +147,14 @@ if(IsCaptured){
         binding.btnPunchIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(IsCaptured){
-                    uploadData();
-                }
-                else{
+                if (IsCaptured) {
+                    if(!TextUtils.isEmpty(LocationData)){
+                        uploadData();
+                    }
+                    else {
+                        AssetUtils.showAlertDialog(context, "", "Please enable your location permission");
+                    }
+                } else {
                     AssetUtils.showAlertDialog(context, "", "Please capture your Image");
                 }
             }
@@ -208,12 +215,12 @@ if(IsCaptured){
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-
                     camera.takePicture(null, null, PictureCallback);
                 }
             }).start();
         }
     }
+
     private Bitmap compressAndResizeBitmap(Bitmap bitmap, int quality, int maxDimension) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -230,33 +237,38 @@ if(IsCaptured){
         resizedBitmap.compress(Bitmap.CompressFormat.PNG, quality, byteArrayOutputStream);
         return resizedBitmap;
     }
+
     private Camera.PictureCallback PictureCallback = new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                // Convert the byte array to a Bitmap
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                // Rotate the bitmap to the correct orientation
-                bitmap = rotateBitmap(bitmap, getCameraDisplayOrientation());
-                // Compress and resize the Bitmap to ensure it's below 300 KB
-                bitmap = compressAndResizeBitmap(bitmap, 100, 1024);
-                // Convert the Bitmap to a base64 encoded string
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream.toByteArray();
-                String base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP);
-                // Create a DataURL
-                String dataUrl = "data:image/jpeg;base64," + base64Image;
-                SharedPreferenceManager.setImageData(context, dataUrl);
-                Log.e("Image", dataUrl);
-                ImageData = dataUrl;
-                IsCaptured = true;
-                binding.buttonCapture.setVisibility(View.INVISIBLE);
-                if(IsCaptured){
-                    camera.release();
-                }
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            // Convert the byte array to a Bitmap
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            // Rotate the bitmap to the correct orientation
+            bitmap = rotateBitmap(bitmap, getCameraDisplayOrientation());
+            // Compress and resize the Bitmap to ensure it's below 300 KB
+            bitmap = compressAndResizeBitmap(bitmap, 100, 1024);
+            // Convert the Bitmap to a base64 encoded string
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            String base64Image = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+            // Create a DataURL
+            String dataUrl = "data:image/jpeg;base64," + base64Image;
+            SharedPreferenceManager.setImageData(context, dataUrl);
+            Log.e("Image", dataUrl);
+            ImageData = dataUrl;
+            IsCaptured = true;
+            binding.buttonCapture.setVisibility(View.GONE);
+            if (camera!= null) {
+                camera.release();
                 camera = null;
             }
+            else{
+                camera = Camera.open();
+            }
+        }
     };
+
     private int getCameraDisplayOrientation() {
         Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(getBackCameraId(), info);
@@ -292,6 +304,7 @@ if(IsCaptured){
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
+
     private int getBackCameraId() {
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
@@ -334,7 +347,7 @@ if(IsCaptured){
 
                                     Log.e("LocationName", locationName);
                                     LocationData = locationName;
-                                    LocationCoordinates = ""+location.getLatitude()+","+location.getLongitude()+"";
+                                    LocationCoordinates = "" + location.getLatitude() + "," + location.getLongitude() + "";
                                     Log.e("Location1", LocationCoordinates);
 
                                 }
@@ -343,17 +356,50 @@ if(IsCaptured){
                             }
                         } else {
                             // Request location updates
-                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
-                                return;
-                            }
-                            fusedLocationClient.requestLocationUpdates(new LocationRequest(), locationCallback, Looper.getMainLooper());
+                            LocationRequest locationRequest = LocationRequest.create();
+                            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                            locationRequest.setInterval(1000);
+                            locationRequest.setFastestInterval(500);
+
+                            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                                    .addLocationRequest(locationRequest);
+
+                            SettingsClient settingsClient = LocationServices.getSettingsClient(context);
+                            Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+                            task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+                                @Override
+                                public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                                    // GPS is enabled, request location updates
+                                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        // TODO: Consider calling
+                                        //    ActivityCompat#requestPermissions
+                                        // here to request the missing permissions, and then overriding
+                                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                        //                                          int[] grantResults)
+                                        // to handle the case where the user grants the permission. See the documentation
+                                        // for ActivityCompat#requestPermissions for more details.
+
+                                        return;
+                                    }
+                                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+                                }
+                            });
+
+                            task.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    if (e instanceof ResolvableApiException) {
+                                        // GPS is disabled, show a dialog to the user asking them to enable GPS
+                                        ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                                        try {
+                                            resolvableApiException.startResolutionForResult(PunchInActivity.this, REQUEST_LOCATION_PERMISSION);
+                                        } catch (IntentSender.SendIntentException ex) {
+                                            ex.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -372,6 +418,10 @@ if(IsCaptured){
             CameraPermissionGranted = true;
             // Initialize the camera
           camera = getFrontFacingCamera();
+            if (camera!= null) {
+                mPreview = new CameraPreview(this, camera);
+                binding.cameraPreview.addView(mPreview);
+            }
         }
     }
     private void requestLocationPermission(){
@@ -436,6 +486,7 @@ if(IsCaptured){
                         binding.locationData.setSelected(true);
                         Log.e("Location2", location.toString());
                         Log.e("LocationName2", locationName);
+                        LocationData = locationName;
 
                     }
                 } catch (IOException e) {
@@ -538,21 +589,41 @@ if(IsCaptured){
 
     @Override
     protected void onDestroy() {
-        if(IsCaptured){
+        if (camera != null) {
             camera.release();
+            camera = null;
         }
         IsCaptured = false;
         super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
     private void setDefault(){
         IsCaptured = false;
         ImageData = "";
         LocationData = "";
         binding.locationData.setText("");
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (LocationPermissionGranted) {
+            retrieveLocation();
+        }
+        if (CameraPermissionGranted) {
+            camera = getFrontFacingCamera();
+            if (camera!= null) {
+                mPreview = new CameraPreview(this, camera);
+                binding.cameraPreview.addView(mPreview);
+            } else {
+                // Handle the case where the camera is not available
+            }
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (camera!= null) {
+            camera.release();
+            camera = null;
+        }
     }
 }

@@ -95,7 +95,7 @@
                             android:hint="Password"
                             android:inputType="textPassword"
                             android:letterSpacing="0.1"
-                            android:maxLength="12"
+                            android:maxLength="50"
                             android:textColor="@color/primaryTextColor"
                             android:textColorHint="@color/primaryTextColor"
                             android:textSize="18sp" />
